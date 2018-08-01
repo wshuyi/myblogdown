@@ -1,0 +1,221 @@
+---
+title: "如何用 R 绘制动态统计图？"
+author: "王树义"
+date: "2018-08-01"
+---
+
+
+
+<p><img src="/post/assets/2018-07-29-18-04-21-065268.gif" /></p>
+<blockquote>
+<p>如果一幅图胜过千言万语，那么一幅会动的图呢？</p>
+</blockquote>
+<div class="section level1">
+<h1>需求</h1>
+<p>绘制统计图形，是为了给谁看？</p>
+<p>显然<strong>不是</strong>给电脑看。因为它看不懂，也没必要看。给它数据就好了。它理解起来，更准确。</p>
+<p>绘制统计图形，是<strong>给人看</strong>的。可以给<strong>别人</strong>看。例如合作者、读者、审稿人，或者演讲时的观众。但更多的情况，图也是给自己看的。</p>
+<p>为什么要画图？因为密密麻麻的数字或符号，远不如一幅图像，看得清楚和舒服。人类中的大多数，目前还<strong>没有进化</strong>出对海量原始数据，<strong>条件反射</strong>一般的理解能力。</p>
+<p>漫长的演化史上，人类的感官只要能有效发现食物（包含猎物），快速捕获危险信号（例如捕食者逼近），和同类高效交流（使用声音、表情或肢体语言）就大概率可以在残酷的自然淘汰赛里幸存下来。</p>
+<p><img src="/post/assets/2018-07-29-18-04-18-622497.jpeg" /></p>
+<p>不得不从财务报表这样的密集数据里，发现机会和风险，是最近几百年才有的事儿。</p>
+<p><img src="/post/assets/2018-07-29-18-04-19-973049.jpeg" /></p>
+<p>巴菲特和芒格这样的投资大家，也许有这种超能力。但这种能力，显然不是所有人的标配。对普通人来说，理解大量的数据，统计图形很必要。因此人们常说，“一幅图胜过千言万语”。</p>
+<p>在《<a href="https://www.jianshu.com/p/fdde9fc03f94">如何用Python从海量文本抽取主题？</a>》一文里，我给你展示过如何绘制主题挖掘图形。</p>
+<p><img src="/post/assets/2018-07-29-18-04-20-085009.jpg" /></p>
+<p>而《<a href="https://www.jianshu.com/p/0c782715e58a">如何用Python和R对故事情节做情绪分析？</a>》一文中，我给你介绍了如何绘制故事情绪时间序列。</p>
+<p><img src="/post/assets/2018-07-29-18-04-20-198808.png" /></p>
+<p>如你所见，这些图很有用。但是它们只是静态的。那么，如果图是动态的呢？那至少，它能够给我们提供<strong>更多一个维度</strong>的信息。</p>
+<p>这种功能，真的有用吗？我这里给你看一个例子。</p>
+<p><img src="/post/assets/2018-07-29-18-04-21-065268.gif" /></p>
+<p>这幅动态统计图，描绘了世界不同区域，人均 GDP 和预期寿命之间的关联。随着左上角年份的不断变化，你会看到几十年来，这个世界的发展变化。Hans Rosling 曾经用类似的数据和动画效果，做了非常精彩的 TED 演讲。我上课的时候，不止一次拿来作为演示样例，让学生揣摩学习。</p>
+<p><img src="/post/assets/2018-07-29-18-04-21-123108.jpeg" /></p>
+<p>如果你感兴趣的话，可以点击<a href="https://www.ted.com/talks/hans_rosling_asia_s_rise_how_and_when?language=zh-tw#t-357626">这个链接</a>查看视频。</p>
+<p>你知道吗？只需要短短10行语句，你也能自己绘制出这个图形。</p>
+<p>不过我们学东西，不宜贪多求快。要绘制上图，你需要了解相关的基础知识。一下子摄入很多新知，可能造成认知负荷，对你的学习兴趣没有益处。本文中，我用一个<strong>更简单</strong>的例子，给你展现如何用 R 绘制动态统计图。有了它作为基础，结合我给你推荐的相关学习资源，你也能很快做出更为实用，甚至是令人惊艳的动图。</p>
+</div>
+<div class="section level1">
+<h1>预览</h1>
+<p>实际动手之前，我想让你看一下，用 R 可以绘制出什么样的动态统计图效果。你不需要安装任何软件。只需要点击<a href="https://mybinder.org/v2/gh/wshuyi/demo-gganimate-nycflights/master?urlpath=rstudio">这个链接</a>（<a href="http://t.cn/ReaP9Mk" class="uri">http://t.cn/ReaP9Mk</a>），就可以使用 R 编程环境了。</p>
+<p><img src="/post/assets/2018-07-29-18-04-21-177629.jpeg" /></p>
+<p>等准备工作完毕，你会看到，浏览器里面开启了一个 RStudio 界面。</p>
+<p><img src="/post/assets/2018-07-29-18-04-22-111770.jpeg" /></p>
+<p>点击左上角的 <code>File</code> -&gt; <code>Open File</code>，并且从出现的文件列表中，选择 <code>code.Rmd</code> 。</p>
+<p><img src="/post/assets/2018-07-29-18-04-22-173960.jpeg" /></p>
+<p>你就能看见下图这样打开该文件后的结果。</p>
+<p><img src="/post/assets/2018-07-29-18-04-22-246726.jpeg" /></p>
+<p><code>Rmd</code> 文件后缀，代表 <code>R Markdown</code>，是 RStudio 这个 IDE 上可以使用的一种特殊的 Markdown 文件。说它特殊，是因为其中的代码段落，可以直接运行出结果。</p>
+<p><img src="/post/assets/2018-07-29-18-04-22-290274.jpeg" /></p>
+<p>界面左上方这里，有一个毛线球形状的按钮，名称叫做 <code>Knit</code> ，点击一下，它会把这个 <code>code.Rmd</code> 文件，转换成 HTML ，并且其中全部的代码，都显示出运行结果来。这是第一页：</p>
+<p><img src="/post/assets/2018-07-29-18-04-22-413509.jpeg" /></p>
+<p>翻到最后一页，效果是这样的：</p>
+<p><img src="/post/assets/2018-07-31-15-44-36-609664.gif" /></p>
+<p>怎么样，挺有趣吧？想不想自己试试看？</p>
+</div>
+<div class="section level1">
+<h1>上手</h1>
+<p>点击左上角的 <code>File</code> -&gt; <code>New File</code> ，选择菜单里面的第一项 <code>R Script</code> 。</p>
+<p><img src="/post/assets/2018-07-29-18-04-22-473582.jpeg" /></p>
+<p>此时，你会看到左侧分栏一个空白编辑区域开启，可以输入语句了。</p>
+<p><img src="/post/assets/2018-07-29-18-04-23-448750.jpeg" /></p>
+<p>输入之前，我们先给文件起个名字。点击 <code>File</code> -&gt; <code>Save</code> 按钮。</p>
+<p><img src="/post/assets/2018-07-29-18-04-23-539303.png" /></p>
+<p>在新出现的对话框里面，输入 <code>demo</code> ，回车。</p>
+<p><img src="/post/assets/2018-07-29-18-04-23-650413.jpeg" /></p>
+<p>下面就可以输入并运行代码了。</p>
+<p>其实我们下面输入的代码，就是刚才你在 <code>code.Rmd</code> 文件里见到的寥寥几个代码段落。而且，就连这几个代码段，也不是你将来绘制动态统计图都需要用到的。它们中的大多数内容，只是为了给你逐步展示方法，加入的<strong>中间过程</strong>而已。</p>
+<p>如果你比较心急，只想获得最终的结果，那么你只需要录入以下这9行语句：</p>
+<pre class="r"><code>library(&quot;tidyverse&quot;)
+library(&quot;lubridate&quot;)
+library(&quot;gganimate&quot;)
+load(&#39;carriers_jan.RData&#39;)
+carriers_jan %&gt;%
+  ggplot(aes(x=carrier, y=n, fill=carrier)) +
+  geom_bar(stat=&#39;identity&#39;, position=&#39;identity&#39;) +
+  transition_time(mydate) +
+  labs(title=&#39;{frame_time}&#39;)</code></pre>
+<p>点击运行，就能做出你想要的结果了。</p>
+<p>然而，这样一来，你还是不清楚具体语句的含义。将来没办法很好地应用到自己的实际工作和科研中去。所以如果你能抽出10分钟的时间，还是请按照我下面的说明来操作。根据教程，一步步手动输入语句。这样更有助于你的理解，收获会更大。</p>
+</div>
+<div class="section level1">
+<h1>代码</h1>
+<p>首先，我们需要读入几个必要的软件包：</p>
+<pre class="r"><code>library(&quot;tidyverse&quot;)
+library(&quot;lubridate&quot;)
+library(&quot;gganimate&quot;)</code></pre>
+<p>如果你看过我的《<a href="https://www.jianshu.com/p/c2e030187495">如何用R和API免费获取Web数据？</a>》一文，对于 <code>tidyverse</code> 应该并不陌生。它是大神 Hadley 等人共同开发的一系列 R 工具包合集。对我来说，它改变了之前 R 语言“难以学习”、“语法古怪”、“不好使用”等刻板印象。</p>
+<p><code>lubridate</code> 是用来处理时间数据的 R 软件包。如果没有这东西，你每次操作时间数据，都会麻烦许多。</p>
+<p><code>gganimate</code> 顾名思义，后面我们绘制动态图形，需要用到。</p>
+<p>下面看看我们这次使用的数据。数据保存的格式是 <code>.RData</code> ，需要使用 <code>load()</code> 函数读入。</p>
+<pre class="r"><code>load(&#39;carriers_jan.RData&#39;)</code></pre>
+<p>读入以后，保存在其中的一个数据框变量 <code>carriers_jan</code> 就复活了。下面我们看看其内容：</p>
+<pre class="r"><code>carriers_jan</code></pre>
+<pre><code>## # A tibble: 93 x 3
+
+##    mydate     carrier     n
+
+##    &lt;date&gt;     &lt;chr&gt;   &lt;int&gt;
+
+##  1 2013-01-01 AA         94
+
+##  2 2013-01-01 DL        112
+
+##  3 2013-01-01 UA        165
+
+##  4 2013-01-02 AA         94
+
+##  5 2013-01-02 DL        152
+
+##  6 2013-01-02 UA        170
+
+##  7 2013-01-03 AA         95
+
+##  8 2013-01-03 DL        128
+
+##  9 2013-01-03 UA        159
+
+## 10 2013-01-04 AA         95
+
+## # ... with 83 more rows
+</code></pre>
+<p>这个数据实际上是从《<a href="https://www.jianshu.com/p/42a61419d656">如何用4行 R 语句，快速探索你的数据集？</a>》一文中的 <code>nycflights13</code> 数据集，通过转换得来的。转换后的数据，统计了不同航空公司在2013年1月，每一天从纽约三大机场起飞航班次数。</p>
+<p>为了简便，我们在这个数据集里，只保留了3家航空公司，即：</p>
+<ul>
+<li>美国航空（American Airlines，AA）</li>
+<li>达美航空（Delta Air Lines, DL）</li>
+<li>美联航（United Airlines, UA）</li>
+</ul>
+<p>下面我们挑出1月1日的数据看看：</p>
+<pre class="r"><code>carriers_jan %&gt;%
+  filter(mydate == ymd(&#39;20130101&#39;))</code></pre>
+<pre><code>## # A tibble: 3 x 3
+
+##   mydate     carrier     n
+
+##   &lt;date&gt;     &lt;chr&gt;   &lt;int&gt;
+
+## 1 2013-01-01 AA         94
+
+## 2 2013-01-01 DL        112
+
+## 3 2013-01-01 UA        165
+</code></pre>
+<p>可见，这一天里，美国航空起飞航班 94 架次，达美 112 ，美联航为 165 。</p>
+<p>根据上表，我们绘制一张柱状图(bar chart)。横坐标是航空公司名称，是分类数据；纵坐标是航班次数，是量化数据。</p>
+<pre class="r"><code>carriers_jan %&gt;%
+  filter(mydate == ymd(&#39;20130101&#39;)) %&gt;%
+  ggplot(aes(x=carrier, y=n, fill=carrier)) +
+  geom_bar(stat=&#39;identity&#39;, position=&#39;identity&#39;)</code></pre>
+<p><img src="/post/assets/2018-07-29-18-04-23-693247.png" /></p>
+<p>如上图所示，三家航空公司从纽约机场起飞次数，分别采用了不同颜色柱状图进行了可视化。红色是美国航空，绿色是达美航空，蓝色是美联航。</p>
+<p>简单解释一下其中的 <code>ggplot</code> 语句。<code>ggplot2</code> 也是 <a href="https://github.com/hadley">Hadley Wickham</a> 的作品，属于 <code>tidyverse</code> 软件包的一部分。它将 Leland Wilkinson 提出的“绘图语法”（Grammar of Graphics）在 R 语言上实现。</p>
+<p>在《<a href="https://www.jianshu.com/p/d52020f0c247">如何用 Python 和 API 收集与分析网络数据？</a>》一文中，我们已经介绍过 <code>ggplot2</code> 的 Python 克隆（plotnine），所以这里就不赘述背景了。你只要记住，它绘制图形的时候，采用的是“分层”机制就好。</p>
+<p><img src="/post/assets/2018-07-29-18-04-23-803649.jpeg" /></p>
+<p><code>ggplot(aes(x=carrier, y=n, fill=carrier))</code> 这一句讲述映射(mapping)关系，指定了把 <code>carrier</code> 信息投射到 x 轴， <code>n</code>（航班次数）投射到 y 轴，用不同 <code>carrier</code> 类别填充不同的色彩。</p>
+<p>但是单单这一句，实际上是绘制不出东西来的，不信你可以尝试执行一下：</p>
+<pre class="r"><code>carriers_jan %&gt;%
+  filter(mydate == ymd(&#39;20130101&#39;)) %&gt;%
+  ggplot(aes(x=carrier, y=n, fill=carrier))</code></pre>
+<p><img src="/post/assets/2018-07-29-18-04-23-851073.png" /></p>
+<p>请注意这个图里， x 轴和 y 轴的设置，都与我们的预期一致。但是任何实质性内容，都没有绘制出来。因为咱们还没有告诉 ggplot ，打算画一个什么类别的统计图形。这就是下一句 <code>geom_bar(stat='identity', position='identity')</code> 的用处。</p>
+<p>这句话告诉 <code>ggplot</code> ，请绘制柱状图，柱的高度按照 y 值设置，对应 x 上每一个取值（航空公司名称），分别绘制一根柱。</p>
+<p>这张静态图，只能告诉我们2013年1月1日这一天，纽约机场这3个航空公司起飞航班数量信息。假如我们想多了解一个维度，也就是把时间加进去，怎么办？</p>
+<p>这里办法并不唯一。</p>
+<p>最简单的常规方法，是把三维信息压缩到二维平面里面去。因为我们看二维图像，除了能观察到位置区别之外，还可以辨识色彩。利用下列语句，你可以把这张图轻松做出来。</p>
+<pre class="r"><code>carriers_jan %&gt;%
+  ggplot(aes(x=mydate, y=n, color=carrier)) +
+  geom_point() + geom_line()</code></pre>
+<p><img src="/post/assets/2018-07-29-18-04-24-995159.png" /></p>
+<p>注意，这里因为我们不再把时间限定在1月1日了，因此你得把 <code>filter(mydate == ymd('20130101'))</code> 这一句去掉，使用全部1个月的时间。否则使用时间轴就没有意义了。</p>
+<p>这里的 <code>ggplot(aes(x=mydate, y=n, color=carrier))</code> ，你应该能观察到跟之前的图形间，映射关系的差别。不同于上一幅图，我们把 <code>mydate</code> ，而不是 <code>carrier</code> 映射到了 x 轴。 y 轴的映射关系没有变化。</p>
+<p>我们此次不打算绘制柱状图了，而是描绘随时间变化趋势，所以选用的是散点图（<code>geom_point()</code>）+折线图（<code>geom_line()</code>）。这就意味着，再考虑柱状图里面的填充，就不恰当了，所以我们把 <code>carrier</code> 的信息，映射到颜色上去（<code>color=carrier</code>）。</p>
+<p>从这张图里，你可以发现非常显著的规律性。假如你不想这样压缩信息，而希望用图形随时间的动态变化，来体现附加的时间维度，该怎么办？</p>
+<p>这时，你就需要使用 <code>gganimate</code> 这个动画包的功能了。<code>gganimate</code> 目前的开发维护者，是 Thomas Lin Pedersen 。<a href="https://github.com/thomasp85">这是</a>他的 github 页面地址。</p>
+<p><img src="/post/assets/2018-07-29-18-04-25-098690.jpeg" /></p>
+<p>他把原先的 <code>gganimate</code> 包接管了过来，仿照 <code>ggplot</code> 的风格，对语法进行了修改和补充，使其能够无缝融入到 <code>ggplot</code> 语句里，很方便地调用。因为可以用动态体现时间维度，所以我们这次依然绘制柱状图。语句如下：</p>
+<pre class="r"><code>carriers_jan %&gt;%
+  ggplot(aes(x=carrier, y=n, fill=carrier)) +
+  geom_bar(stat=&#39;identity&#39;, position=&#39;identity&#39;) +
+  transition_time(mydate)</code></pre>
+<p><img src="/post/assets/2018-07-29-18-04-25-260038.gif" /></p>
+<p>图动起来了，是吧？</p>
+<p>解释一下语句。</p>
+<p>与之前静态柱状图的区别，也是去掉了时间的限定那一句 <code>filter(mydate == ymd('20130101'))</code> ，以便描绘整个儿一月份的情况。另一个显著差别，是加入了最后一行语句， <code>transition_time(mydate)</code> ，这也是图像能够动起来的关键。</p>
+<p>根据 <code>gganimate</code> 官方的说明，图形转换可以有多个不同类型语句来控制。因为我们恰好有 <code>mydate</code> 这个时间数据列，所以可以使用最自然而简单的 <code>transition_time()</code> 方法。<code>transition_time(mydate)</code> 根据时间信息对数据框进行切片，然后分别加以展示。图像因而动了起来。</p>
+<p>不过，这里有个很严重的问题——你根本就看不清，当前的动态结果对应哪个时间。对不对？</p>
+<p>咱们需要改进一下。改进的方法很简单：加入图片标题，显示时间，并且让标题对应着一起变化。修改后的代码如下：</p>
+<pre class="r"><code>carriers_jan %&gt;%
+  ggplot(aes(x=carrier, y=n, fill=carrier)) +
+  geom_bar(stat=&#39;identity&#39;, position=&#39;identity&#39;) +
+  transition_time(mydate) +
+  labs(title=&#39;{frame_time}&#39;)</code></pre>
+<p><img src="/post/assets/2018-07-29-18-04-25-566538.gif" /></p>
+<p>这下，你一眼就可以从标题中，看到当前动图对应的时间了。这里我们用到了 <code>ggplot</code> 的 <code>labs()</code> 函数，这个函数负责图片的标记设定，除了标题以外，你还可以设置横纵轴说明等内容。</p>
+<p>我们用 <code>title</code> 参数设置标题内容。标题需要变化，所以我们得传入<strong>一个可以变化的量</strong>给 <code>title</code> 参数。我们传入的是 <code>{frame_time}</code> ，这就是我们刚才提到的， <code>gganimate</code> 自动切片所用的时间数据。 传入参数时，不要忘了需要将其包裹在双引号里，作为字符串类型传入。</p>
+</div>
+<div class="section level1">
+<h1>小结</h1>
+<p>本文给你展示了 R 环境绘制动态统计图的方法，具体包含以下知识点：</p>
+<ul>
+<li>如何读入 <code>.RData</code> 格式的数据文件；</li>
+<li>如何利用 <code>ggplot</code> 命令映射变量，选择统计图类型（包括柱状图、散点图和折线图等）；</li>
+<li>如何使用 <code>gganimate</code> 的 <code>transition_time()</code> 方法绘制基于时间数据的动态图；</li>
+<li>如何通过 <code>labs</code> 设置，动态显示时间，以便于和图像的变化对应。</li>
+</ul>
+<p>为了展示样例的最小化，本文的动态统计图非常简单，技术含量并不高。抛砖引玉。希望你举一反三，绘制出更有价值、内容也更加丰富的动态统计图来。</p>
+<p>如果你对 <code>ggplot2</code> 绘图包感兴趣，想详细了解其语法，可以读作者 Hadley Wickham 自己写的书《ggplot2：数据分析与图形艺术》。</p>
+<p><img src="/post/assets/2018-07-29-18-04-25-620951.jpeg" /></p>
+<p>如果你想了解 gganimate 包的更多用法，可以阅读<a href="https://github.com/thomasp85/gganimate">官方文档</a>，或者看这段作者的<a href="https://www.youtube.com/watch?v=21ZWDrTukEs&amp;t=17s">演讲视频</a>。</p>
+<p><img src="/post/assets/2018-07-29-18-04-25-680860.jpeg" /></p>
+<p>希望这些资源，能对你今后可视化沟通、展示自己的数据分析结果，有所帮助。</p>
+<p>给你留个思考题：</p>
+<p>本文中的数据，是从《<a href="https://www.jianshu.com/p/42a61419d656">如何用4行 R 语句，快速探索你的数据集？</a>》一文中的 <code>nycflights13</code> 数据集，通过转换（data manipulation）得来的。你能不能自己利用 R 或者 Python 语句，完成这一转化过程呢？</p>
+<p>欢迎留言，把你的思考和解决过程分享给大家。</p>
+<p>小提示：</p>
+<ul>
+<li>如果你用 R ，可以参考 <a href="https://dplyr.tidyverse.org/">dplyr 包的文档</a>；</li>
+<li>如果你用 Python ，可以参考《<a href="https://www.jianshu.com/p/a7a7db17e26d">推荐Python数据框Pandas视频教程</a>》一文。</li>
+</ul>
+<p>喜欢请点赞。还可以微信关注和置顶我的公众号<a href="http://oejqwrqkh.bkt.clouddn.com/2016-10-11-22-26-16.jpg">“玉树芝兰”(nkwangshuyi)</a>。</p>
+<p>如果你对数据科学感兴趣，不妨阅读我的系列教程索引贴《<a href="https://www.jianshu.com/p/85f4624485b9">如何高效入门数据科学？</a>》，里面还有更多的有趣问题及解法。</p>
+</div>
