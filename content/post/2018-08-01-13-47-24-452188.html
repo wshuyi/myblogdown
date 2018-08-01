@@ -1,0 +1,29 @@
+---
+title: "给 Homebrew 提速"
+author: "王树义"
+date: "2018-08-01"
+---
+
+
+
+<p>随便一个 update ，20分钟都没完成。我怒了。</p>
+<p>于是查资料。</p>
+<p>确认目前的加速方法，我都应用了。</p>
+<p>例如<a href="https://lug.ustc.edu.cn/wiki/mirrors/help/homebrew-bottles">这里</a>以及<a href="https://lug.ustc.edu.cn/wiki/mirrors/help/brew.git">这里</a>。</p>
+<p>于是学会了一招：</p>
+<pre class="bash"><code>brew update --verbose</code></pre>
+<p>这样一来，就不再是个吸收时间的黑洞了。我大概能搞清楚，究竟哪些命令正在执行。</p>
+<p>发现了问题，原来有一些很久不用的 tap ，居然还都赖在那里。</p>
+<p>例如：<code>railwaycat/homebrew-emacsmacport</code> 以及 <code>phinze/homebrew-cask</code></p>
+<p>我的办法也很简单：</p>
+<pre class="bash"><code>brew untap railwaycat/homebrew-emacsmacport
+brew untap phinze/homebrew-cask</code></pre>
+<p>然后再次执行：</p>
+<pre class="bash"><code>brew update --verbose</code></pre>
+<p>这次估计需要下载的东西少多了。</p>
+<p>不过实话实说，依然很慢。而且在 <code>homebrew/homebrew-cask</code> 这里，还总是报错。</p>
+<p><img src="/post/assets/2018-07-31-16-07-49-052956.jpeg" /></p>
+<p>我参考了资料，这样执行：</p>
+<pre class="bash"><code>brew update-reset &amp;&amp; brew update</code></pre>
+<p><img src="/post/assets/2018-07-31-16-06-35-522745.jpeg" /></p>
+<p>终于，这次算是步入正轨了。</p>
